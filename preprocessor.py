@@ -101,6 +101,8 @@ def calcLBPPixel(image, x, y):
     bit = 1
     for X in range(x-1,x+2):
         for Y in range(y-1,y+2):
+            if x == X and y == Y:
+                continue
             if image[x,y] > image[X,Y]:
                 result = result | bit
             bit = bit << 1
@@ -125,14 +127,8 @@ def calcLBP(image, feature):
     return result
 
 ################################################################################
-# Main
+# Draw
 ################################################################################
-
-def getPinnedPoint(x,y):
-    return "  "+str(x)+","+str(y)+" "+str(x)+","+str(y)+"  "
-
-def getPinnedCorners(w,h):
-    return getPinnedPoint(0,0) + getPinnedPoint(w,0) + getPinnedPoint(w,h) + getPinnedPoint(0,h)
 
 def drawCross(image, haar, color, pred=lambda a:True):
     (x,y,w,h),n = mostLikelyHaar(image,haar,pred)
@@ -147,6 +143,16 @@ def drawRect(image, obj):
 def drawPoint(image, point, color):
     (x,y) = point
     cv.Circle(image, (int(x),int(y)), 2, color)
+
+################################################################################
+# Main
+################################################################################
+
+def getPinnedPoint(x,y):
+    return "  "+str(x)+","+str(y)+" "+str(x)+","+str(y)+"  "
+
+def getPinnedCorners(w,h):
+    return getPinnedPoint(0,0) + getPinnedPoint(w,0) + getPinnedPoint(w,h) + getPinnedPoint(0,h)
 
 def rotate2d(angle, center, point):
     x = point[0] - center[0]
@@ -220,6 +226,7 @@ def preprocessImage(inputPath, outputPath):
             ,   'lbp-left-eye' : calcLBP(image, leftEye)
             ,   'lbp-right-eye' : calcLBP(image, rightEye)
             ,   'lbp-mouth' : calcLBP(image, mouth)
+            ,   'tilt' : tiltAngle
     }
 
 #Don't actually warp for now
