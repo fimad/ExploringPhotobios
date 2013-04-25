@@ -13,12 +13,13 @@ import numpy as np
 ################################################################################
 
 if len(sys.argv) < 3:
-    print "Usage: info.pickle [output dir] [input files]*"
+    print "Usage: info.pickle used-images output-dir input-files*"
     exit(1)
 
-mappingFile = sys.argv[1]
-outputDir   = sys.argv[2]
-inputFiles  = sys.argv[3:]
+mappingFile     = sys.argv[1]
+usedImageDir    = sys.argv[2]
+outputDir       = sys.argv[3]
+inputFiles      = sys.argv[4:]
 
 #Haar Classifiers
 haarFace = cv.Load("haar/haarcascade_frontalface_default.xml")
@@ -253,12 +254,15 @@ def preprocessImage(inputPath, outputPath):
 outputId = 0
 info = {}
 for inputPath in inputFiles:
+    a,ext = os.path.splitext(inputPath)
     outputPath = outputDir + "/" + str(outputId) + ".png"
+    copyPath = usedImageDir + "/" + os.path.basename(str(outputId)) + ext
     print inputPath + " -> " + outputPath
     try:
         preprocessImage(inputPath, outputPath)
-        info[inputPath] = preprocessImage(inputPath, outputPath)
+        info[copyPath] = preprocessImage(inputPath, outputPath)
         outputId = outputId + 1
+        os.system("cp "+inputPath+" "+copyPath)
     except ObjectNotFound:
         print "\tCould not find a face..."
 
