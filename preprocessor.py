@@ -191,9 +191,11 @@ def preprocessImage(inputPath, outputPath):
     #Find the most likely face
     (x,y,w,h),n = mostLikelyHaar(image, haarFace)
     croppedImage = cv.CreateImage( (w, h), image.depth, image.nChannels)
+    scaledImage = cv.CreateImage( (128, 128), image.depth, image.nChannels)
     src_region = cv.GetSubRect(image, (x, y, w, h) )
     cv.Copy(src_region, croppedImage)
-    image = croppedImage
+    cv.Resize(croppedImage,scaledImage)
+    image = scaledImage
 
     #Find each ficudial point
     leftEye         = ImageObject(image, haarLeftEye, inPercentRect(image, 0,0,.6,.5))
@@ -225,8 +227,11 @@ def preprocessImage(inputPath, outputPath):
     return {
                 'image' : outputPath
             ,   'lbp-left-eye' : calcLBP(image, leftEye)
+            ,   'left-eye' : leftEye
             ,   'lbp-right-eye' : calcLBP(image, rightEye)
+            ,   'right-eye' : rightEye
             ,   'lbp-mouth' : calcLBP(image, mouth)
+            ,   'mouth' : mouth
             ,   'tilt' : tiltAngle
     }
 
@@ -255,6 +260,8 @@ outputId = 0
 info = {}
 for inputPath in inputFiles:
     a,ext = os.path.splitext(inputPath)
+    if ext == ".gif":
+        continue
     outputPath = outputDir + "/" + str(outputId) + ".png"
     copyPath = usedImageDir + "/" + os.path.basename(str(outputId)) + ext
     print inputPath + " -> " + outputPath
@@ -262,8 +269,8 @@ for inputPath in inputFiles:
         preprocessImage(inputPath, outputPath)
         info[copyPath] = preprocessImage(inputPath, outputPath)
         outputId = outputId + 1
-        os.system("cp "+inputPath+" "+copyPath)
-    except ObjectNotFound:
+        os.system("cp '"+inputPath+"' '"+copyPath+"'")
+    except (ObjectNotFound, IOError):
         print "\tCould not find a face..."
 
 #save the mapping

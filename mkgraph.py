@@ -66,8 +66,8 @@ def x2(a,b):
     """Computes chi-squared between a and b where b is the ideal"""
     value = 0
     for k in set(a.keys() + b.keys()):
-        diff = query(a,k)*len(b.keys())/float(len(a.keys())) - query(b,k)
-        value += diff*diff/(query(b,k)+0.000000000001)
+        diff = query(a,k) - query(b,k)
+        value += diff*diff/(query(b,k)+query(a,k))
     return value
 
 ################################################################################

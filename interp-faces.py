@@ -73,6 +73,14 @@ def shortestPath(srcFace,dstFace):
             found = True
     return lst
     
+def expandPath(faces, depth=0):
+    if depth <= 0:
+        return faces
+    result = []
+    for i in xrange(0,len(faces)-1):
+        graph[faces[i]][faces[i+1]] = float('inf')
+        result = result[:-1] + expandPath(shortestPath(faces[i],faces[i+1]),depth-1)
+    return result
     
-faces = shortestPath(face1,face2)
+faces = expandPath(shortestPath(face1,face2),1)
 print(faces)
