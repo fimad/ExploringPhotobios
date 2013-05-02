@@ -60,6 +60,9 @@ class ImageObject:
             result.append((self.x+self.w*X,self.y+self.h*Y))
         return result
 
+    def getTuple(self):
+        return (self.x, self.y, self.w, self.h)
+
 class ObjectNotFound(Exception):
     def __init__(self):
         pass
@@ -227,11 +230,11 @@ def preprocessImage(inputPath, outputPath):
     return {
                 'image' : outputPath
             ,   'lbp-left-eye' : calcLBP(image, leftEye)
-            ,   'left-eye' : leftEye
+            ,   'left-eye' : leftEye.getTuple()
             ,   'lbp-right-eye' : calcLBP(image, rightEye)
-            ,   'right-eye' : rightEye
+            ,   'right-eye' : rightEye.getTuple()
             ,   'lbp-mouth' : calcLBP(image, mouth)
-            ,   'mouth' : mouth
+            ,   'mouth' : mouth.getTuple()
             ,   'tilt' : tiltAngle
     }
 

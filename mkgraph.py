@@ -9,6 +9,32 @@ import math
 import numpy as np
 
 ################################################################################
+# ImageObject
+################################################################################
+
+class ImageObject:
+    """An object in an image that records the bounding box"""
+    def findPoints(self, image,haar,points,pred):
+        (x,y,w,h),n = mostLikelyHaar(image,haar,pred)
+        result = []
+        for (X,Y) in points:
+            result.append((x+w*X,y+h*Y))
+        return result
+
+    def __init__(self, image, haar, pred=lambda a:True):
+        points = self.findPoints(image, haarLeftEye, [(0,0), (1,1)], pred)
+        self.x = points[0][0]
+        self.y = points[0][1]
+        self.w = points[1][0] - self.x
+        self.h = points[1][1] - self.y
+
+    def getPoints(self, points):
+        result = []
+        for (X,Y) in points:
+            result.append((self.x+self.w*X,self.y+self.h*Y))
+        return result
+
+################################################################################
 # Handle Command Line Args
 ################################################################################
 
@@ -19,8 +45,8 @@ if len(sys.argv) < 4:
 infoFilePath  = sys.argv[1]
 graphFilePath = sys.argv[2]
 power = float(sys.argv[3])
-mouthWeight = 1
-eyeWeight = 0
+mouthWeight = .8
+eyeWeight = .2
 
 #load the info
 infoFile = open(infoFilePath,"r")
@@ -65,9 +91,11 @@ def query(a,k):
 def x2(a,b):
     """Computes chi-squared between a and b where b is the ideal"""
     value = 0
+    aNorm = float(sum([a[i] for i in a.keys()]))
+    bNorm = float(sum([b[i] for i in b.keys()]))
     for k in set(a.keys() + b.keys()):
-        diff = query(a,k) - query(b,k)
-        value += diff*diff/(query(b,k)+query(a,k))
+        diff = query(a,k)*bNorm/aNorm - query(b,k)
+        value += diff*diff/(query(b,k)+query(a,k)*bNorm/aNorm)
     return value
 
 ################################################################################

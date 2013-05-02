@@ -15,12 +15,13 @@ import numpy as np
 ################################################################################
 
 if len(sys.argv) < 4:
-    print "Usage: graph.pickle face1 face2"
+    print "Usage: graph.pickle face1 face2 depth"
     exit(1)
 
 graphFilePath = sys.argv[1]
 face1 = sys.argv[2]
 face2 = sys.argv[3]
+depth = int(sys.argv[4])
 
 #load the graph
 graphFile = open(graphFilePath,"r")
@@ -45,9 +46,10 @@ class elem:
     def __cmp__(self, other):
         return cmp(self.value,other.value)
 
-def shortestPath(srcFace,dstFace):
+def shortestPath(srcFace,dstFace,badNodes):
     heapElems = {}
     heap = []
+    badNodes -= set([srcFace,dstFace])
     for k in graph.keys():
         e = elem(k,float('inf'))
         if k == srcFace :
@@ -58,10 +60,12 @@ def shortestPath(srcFace,dstFace):
     while(len(heap) > 0):
         node = heapq.heappop(heap).face
         for j in graph[node].keys() :
+            if j in badNodes:
+                continue
             if heapElems[j].value > (graph[node][j] + heapElems[node].value) :
                  heapElems[j].value = graph[node][j] + heapElems[node].value
                  heapElems[j].back = node
-            print(graph[node][j])
+            #print(graph[node][j])
         heapq.heapify(heap)
     found = False
     lst = [dstFace]
@@ -79,8 +83,9 @@ def expandPath(faces, depth=0):
     result = []
     for i in xrange(0,len(faces)-1):
         graph[faces[i]][faces[i+1]] = float('inf')
-        result = result[:-1] + expandPath(shortestPath(faces[i],faces[i+1]),depth-1)
+        result = result[:-1] + expandPath(shortestPath(faces[i],faces[i+1],set(result)),depth-1)
     return result
     
-faces = expandPath(shortestPath(face1,face2),1)
+print graph.keys()
+faces = expandPath(shortestPath(face1,face2,set([])),depth)
 print(faces)
