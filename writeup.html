@@ -1,0 +1,145 @@
+<html>
+    <body>
+        <h1>Exploring Photobios</h1>
+        <h2>with Will and Jack</h2>
+
+        <br>
+        <h3>Features implemented</h3>
+        <ul>
+            <li>
+                Week 1 (20 points)
+                <ul>
+                    <li>
+                        (10 points) Face detection
+                    </li>
+                    <li>
+                        (10 points) Individual feature detection (eyes, nose, mouth)
+                    </li>
+                </ul>
+            </li>
+            <li>
+                Week 2 (20 points)
+                <ul>
+                    <li>
+                        (20 points) Normalized poses for each face in the
+                        dataset. Use generic face model to transform found
+                        features to a neutral pose.
+                        <ul>
+                            <li>
+                                We did not implement this as described in the
+                                method section of the paper. Doing so would have
+                                required the implementation of the system in the
+                                paper, <a
+                                href="http://www.wisdom.weizmann.ac.il/~ronen/papers/Katz%20Tal%20Basri%20-%20Direct%20Visibility%20of%20Point%20Sets.pdf">Direct
+                                Visibility of Point Sets</a>, along with a 3d
+                                model loader and a simple rendering system.
+                                <br>
+                            </li>
+                            <li>
+                                Instead we implemented the technique presented
+                                in the conclusion of the paper. The authors note
+                                that using 2d affine transformations to warp to
+                                neutral poses was almost as effective as the 3d
+                                approach glossed over in the method.
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                Week 3 (20 points)
+                <ul>
+                    <li>
+                        (10 points) Implement the similarity metric
+                    </li>
+                    <li>
+                        (10 points) Build face graph
+                    </li>
+                </ul>
+            </li>
+            <li>
+                Week 4 (15 points)
+                <ul>
+                    <li>
+                        (10 points) Interpolate between given initial and final faces
+                        Find inbetween images using the shortest path between faces
+                    </li>
+                    <li>
+                        (5 points) Create a video that cross dissolves between the returned sequence of images
+                    </li>
+                </ul>
+            </li>
+        </ul>
+
+        <br>
+        <h3>Using the system</h3>
+        <ul>
+            <li>
+                System requirements:
+                <ul>
+                    <li>python-opencv</li>
+                    <li>numpy</li>
+                    <li>ffmpeg (must be in $PATH)</li>
+                    <li>ImageMagick (must be in $PATH)</li>
+                </ul>
+            </li><br>
+            <li>
+                Running the preprocessor:
+                <br>
+                <pre>./preprocessor.py rip/info.pickle rip/used rip/faces rip/source/*</pre>
+            </li>
+            <li>
+                Building the face graph:
+                <br>
+                <pre>./mkgraph.py rip/info.pickle rip/graph.pickle 1</pre>
+                The final argument is the exponent that each edge is raised to.
+                This is intended to control the length of the path returned
+                during interpolation.
+            </li><br>
+            <li>
+                Interpolating:
+                <br>
+                <pre>./interp-faces.py info.pickle graph.pickle rip/used/0.jpg rip/used/100.jpg depth frames working/ output.avi</pre>
+                The <i>depth</i> argument is the number of expansions to run on
+                the returned path. A value of 1 returns the best results. The
+                <i>frames</i> argument is the number of frames to use for in
+                transitioning between two images.
+            </li>
+        </ul>
+
+        <br>
+        <h3>Results</h3>
+        <ul>
+            <li>
+                <img src=rip/faces/31.png />
+                <img src=rip/faces/20.png />
+                <iframe width="256" height="256"
+                    src="http://www.youtube.com/embed/0ns85GDw9Io"
+                    frameborder="0" allowfullscreen></iframe>
+            </li>
+            <li>
+                <img src=rip/faces/31.png />
+                <img src=rip/faces/119.png />
+                <iframe width="256" height="256"
+                    src="http://www.youtube.com/embed/rHxzDmpMYmU"
+                    frameborder="0" allowfullscreen></iframe>
+            </li>
+            <li>
+                <img src=rip/faces/123.png />
+                <img src=rip/faces/21.png />
+                <iframe width="256" height="256"
+                    src="http://www.youtube.com/embed/m1gWrGMLzB8"
+                    frameborder="0" allowfullscreen></iframe>
+            </li>
+            <li>
+                <img src=rip/faces/123.png />
+                <img src=rip/faces/23.png />
+                <iframe width="256" height="256"
+                    src="http://www.youtube.com/embed/KUsBoJLWpUE"
+                    frameborder="0" allowfullscreen></iframe>
+            </li>
+        </ul>
+
+    <br><br><br>
+    </body>
+</html>
