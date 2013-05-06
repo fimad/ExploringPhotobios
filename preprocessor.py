@@ -194,7 +194,7 @@ def preprocessImage(inputPath, outputPath):
     #Find the most likely face
     (x,y,w,h),n = mostLikelyHaar(image, haarFace)
     croppedImage = cv.CreateImage( (w, h), image.depth, image.nChannels)
-    scaledImage = cv.CreateImage( (128, 128), image.depth, image.nChannels)
+    scaledImage = cv.CreateImage( (256, 256), image.depth, image.nChannels)
     src_region = cv.GetSubRect(image, (x, y, w, h) )
     cv.Copy(src_region, croppedImage)
     cv.Resize(croppedImage,scaledImage)
@@ -217,17 +217,17 @@ def preprocessImage(inputPath, outputPath):
     mouthPoints     = tiltPoints(tiltAngle, mouthPoints)
     nosePoints      = tiltPoints(tiltAngle, nosePoints)
 
-    image = rotateImage(image, tiltAngle, (w/8,h/2))
+    image = rotateImage(image, tiltAngle, (w/2,h/2))
 
     leftEye         = ImageObject(image, haarLeftEye, inPercentRect(image, 0,0,.6,.5))
     rightEye        = ImageObject(image, haarRightEye, inPercentRect(image,.4,0,1,.5))
     mouth           = ImageObject(image, haarMouth, inPercentRect(image,0,.6,1,1))
     nose            = ImageObject(image, haarNose)
 
-    #save image of the cropped face
-    cv.SaveImage(outputPath, image)
+    rotation        = math.log(leftEye.w)-math.log(rightEye.w)
+    print rotation
 
-    return {
+    info = {
                 'image' : outputPath
             ,   'lbp-left-eye' : calcLBP(image, leftEye)
             ,   'left-eye' : leftEye.getTuple()
@@ -236,7 +236,13 @@ def preprocessImage(inputPath, outputPath):
             ,   'lbp-mouth' : calcLBP(image, mouth)
             ,   'mouth' : mouth.getTuple()
             ,   'tilt' : tiltAngle
+            ,   'rotation' : rotation
     }
+
+    #save image of the cropped face
+    cv.SaveImage(outputPath, image)
+
+    return info
 
 #Don't actually warp for now
 #    points = leftEye+rightEye+mouth+nose
@@ -269,7 +275,7 @@ for inputPath in inputFiles:
     copyPath = usedImageDir + "/" + os.path.basename(str(outputId)) + ext
     print inputPath + " -> " + outputPath
     try:
-        preprocessImage(inputPath, outputPath)
+        #preprocessImage(inputPath, outputPath)
         info[copyPath] = preprocessImage(inputPath, outputPath)
         outputId = outputId + 1
         os.system("cp '"+inputPath+"' '"+copyPath+"'")

@@ -115,8 +115,10 @@ for v1 in info.keys():
         graph[v1][v2]['left-eye'] = x2(info[v1]['lbp-left-eye'], info[v2]['lbp-left-eye'])
         graph[v1][v2]['right-eye'] = x2(info[v1]['lbp-right-eye'], info[v2]['lbp-right-eye'])
         graph[v1][v2]['tilt'] = abs(info[v1]['tilt']-info[v2]['tilt'])
+        graph[v1][v2]['rotation'] = abs(info[v1]['rotation']-info[v2]['rotation'])
 
     normalize(graph, 'tilt')
+    normalize(graph, 'rotation')
     normalize(graph, 'mouth')
     normalize(graph, 'left-eye')
     normalize(graph, 'right-eye')
@@ -128,7 +130,9 @@ for v1 in info.keys():
         
         app = 1 - (1-mouthWeight*graph[v1][v2]['mouth'])*(1-.5*eyeWeight*graph[v1][v2]['right-eye'])*(1-.5*eyeWeight*graph[v1][v2]['left-eye'])
         print app
-        graph[v1][v2] = math.pow(1 - (1-app)*(1-graph[v1][v2]['tilt']), power)
+        #graph[v1][v2] = math.pow(1 - (1-app)*(1-graph[v1][v2]['tilt']), power)
+        #graph[v1][v2] = math.pow(1 - (1-app)*(1-graph[v1][v2]['rotation'])*(1-graph[v1][v2]['tilt']), power)
+        graph[v1][v2] = math.pow(1 - (1-app)*(1-graph[v1][v2]['rotation']), power)
         #graph[v1][v2] = math.pow(1 - (1-graph[v1][v2]['tilt']), power)
 
 pickle.dump(graph,open(graphFilePath,"w"))
